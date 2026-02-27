@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemas Informáticos – Horario 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:      #e8a800;
+    --bg:        #f0f4f8;
+    --white:     #ffffff;
+    --border:    #d0d9e4;
+    --text:      #1a2a3a;
+    --text-soft: #4a5a6a;
+    --header-bg: #1a3a6b;
+    --c-red:     #e53935;
+    --c-green:   #43a047;
+    --c-teal:    #00897b;
+    --c-purple:  #8e24aa;
+    --c-orange:  #fb8c00;
+    --c-pink:    #e91e8c;
+    --c-cyan:    #0288d1;
+    --c-lime:    #7cb342;
+    --c-magenta: #ab47bc;
+    --c-gray:    #78909c;
+    --c-brown:   #795548;
+    --c-indigo:  #3949ab;
+    --c-rose:    #f44336;
+    --c-slate:   #546e7a;
+    --c-yellow:  #f9a825;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;padding-bottom:50px}
+
+  header{background:linear-gradient(135deg,#0d2347 0%,#1a3a6b 55%,#0f2a50 100%);padding:28px 40px 22px;text-align:center;border-bottom:4px solid var(--gold);position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,.02) 40px,rgba(255,255,255,.02) 41px);pointer-events:none}
+  header h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.6rem);letter-spacing:6px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.4)}
+  header h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.4rem,4vw,2.6rem);color:var(--gold);letter-spacing:10px;margin-top:2px}
+  header p{margin-top:10px;font-family:'Barlow Condensed',sans-serif;font-size:.92rem;letter-spacing:2px;color:#aec6e8;text-transform:uppercase}
+  header p span{color:#fff;font-weight:700}
+
+  .shift-header{display:flex;align-items:center;gap:16px;margin:32px 20px 10px;padding:0 20px}
+  .shift-header h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;color:var(--header-bg);white-space:nowrap}
+  .shift-header::after{content:'';flex:1;height:2px;background:linear-gradient(to right,var(--header-bg),transparent);opacity:.3}
+
+  .table-wrap{overflow-x:auto;margin:0 16px;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.12);border:1px solid var(--border);background:var(--white)}
+  table{width:100%;border-collapse:collapse;font-family:'Barlow Condensed',sans-serif;font-size:.78rem}
+
+  thead th{background:var(--header-bg);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;padding:10px 8px;text-align:center;border:1px solid rgba(255,255,255,.12);white-space:nowrap}
+  thead th:first-child{background:#0d2347}
+
+  td.day{background:var(--header-bg);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);text-align:center;padding:8px 6px;border:1px solid rgba(255,255,255,.12);white-space:nowrap;min-width:32px}
+  td.time{background:#e8eef5;color:#2a3a50;font-weight:600;font-size:.72rem;text-align:center;padding:6px 10px;border:1px solid var(--border);white-space:nowrap;min-width:84px}
+
+  td.cell{padding:7px 8px;border:1px solid rgba(255,255,255,.3);text-align:center;vertical-align:middle;min-width:118px;line-height:1.3;cursor:pointer;transition:filter .15s,transform .15s,box-shadow .15s;position:relative}
+  td.cell:hover{filter:brightness(1.12);transform:scale(1.04);z-index:5;box-shadow:0 6px 20px rgba(0,0,0,.25);border-radius:4px}
+  td.cell .subj{font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.2);display:block}
+  td.cell .prof{font-weight:600;font-size:.68rem;margin-top:3px;text-shadow:0 1px 2px rgba(0,0,0,.15)}
+  td.cell .hint{position:absolute;top:3px;right:4px;font-size:.55rem;color:rgba(255,255,255,.55)}
+  td.empty{background:#f5f7fa}
+
+  .bg-red    {background:var(--c-red)}
+  .bg-green  {background:var(--c-green)}
+  .bg-teal   {background:var(--c-teal)}
+  .bg-purple {background:var(--c-purple)}
+  .bg-orange {background:var(--c-orange)}
+  .bg-pink   {background:var(--c-pink)}
+  .bg-cyan   {background:var(--c-cyan)}
+  .bg-lime   {background:var(--c-lime)}
+  .bg-magenta{background:var(--c-magenta)}
+  .bg-gray   {background:var(--c-gray)}
+  .bg-brown  {background:var(--c-brown)}
+  .bg-indigo {background:var(--c-indigo)}
+  .bg-rose   {background:var(--c-rose)}
+  .bg-slate  {background:var(--c-slate)}
+  .bg-yellow {background:var(--c-yellow)}
+
+  /* MODAL */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(10,25,50,.52);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center}
+  .overlay.open{display:flex;animation:fadeIn .18s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .modal{background:#fff;border-radius:14px;width:90%;max-width:430px;box-shadow:0 20px 60px rgba(0,0,0,.28);overflow:hidden;animation:slideUp .22s ease}
+  .modal-head{padding:22px 24px 18px;color:#fff;position:relative}
+  .modal-badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:2px 10px;margin-bottom:8px}
+  .modal-title{font-family:'Barlow Condensed',sans-serif;font-size:1.2rem;font-weight:700;line-height:1.25;letter-spacing:.5px;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.3);padding-right:32px}
+  .modal-x{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1rem;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;line-height:1}
+  .modal-x:hover{background:rgba(255,255,255,.35)}
+  .modal-body{padding:20px 24px 24px;background:#fff}
+  .mrow{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #edf0f4}
+  .mrow:last-child{border-bottom:none}
+  .micon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+  .mlabel{font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8a9ab0;font-family:'Barlow Condensed',sans-serif}
+  .mvalue{font-size:.95rem;font-weight:600;color:#1a2a3a;margin-top:2px;line-height:1.3}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px;padding:18px 20px;margin:12px 16px 0;background:var(--white);border-radius:10px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .legend-title{width:100%;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;color:var(--header-bg);margin-bottom:4px}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:.74rem;color:var(--text-soft);font-family:'Barlow Condensed',sans-serif;font-weight:600}
+  .ldot{width:13px;height:13px;border-radius:3px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+  footer{text-align:center;padding:20px;font-size:.74rem;color:#8a9ab0;font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;margin-top:16px}
+  @media(max-width:768px){.table-wrap{margin:0 6px}td.cell{min-width:85px}table{font-size:.65rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sistemas Informáticos</h1>
+  <h2>Horario 2026</h2>
+  <p>Coordinador de Carrera: <span>Lic. Gonzalo Callisaya Loza</span></p>
+</header>
+
+<!-- helper macro via JS template -->
+<script>
+// Shorthand to build a cell
+function c(bg,materia,codigo,carga,nivel,docente,apellido){
+  var color = getComputedStyle(document.documentElement).getPropertyValue('--c-'+bg).trim()||bg;
+  return `<td class="cell bg-${bg}" onclick="showM(this)"
+    data-materia="${materia}" data-codigo="${codigo}"
+    data-carga="${carga}" data-nivel="${nivel}"
+    data-docente="${docente}" data-color="${color}">
+    <span class="subj">${materia}</span><div class="prof">${apellido}</div><span class="hint">ℹ</span></td>`;
+}
+</script>
+
+<!-- ══════════ TURNO MAÑANA ══════════ -->
+<div class="shift-header"><h3>☀ Turno Mañana</h3></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th colspan="2"></th><th>1A</th><th>1B</th><th>2A</th><th>3A</th></tr></thead>
+<tbody>
+
+<tr>
+  <td class="day" rowspan="3">LUNES</td>
+  <td class="time">08:00–09:30</td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web 1</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Base de Datos I" data-codigo="BDD-208" data-carga="4" data-nivel="Segundo Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Base de Datos I</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas II" data-codigo="ADS-306" data-carga="4" data-nivel="Tercer Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Análisis y Diseño Sist. II</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">09:30–11:00</td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web 1</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+  <td class="cell" style="background:#00772D" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Licon Quisbert Alejandro Ruben" data-color="#00772D"><span class="subj" style="color:#FFFFFF">Harware de Computadoras</span><div class="prof" style="color:#FFFFFF">Licon</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Programación II" data-codigo="PRG-202" data-carga="6" data-nivel="Segundo Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Programación II</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles II" data-codigo="PDM-307" data-carga="4" data-nivel="Tercer Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles II</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">11:15–12:45</td>
+  <td class="cell" style="background:#00772D" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Licon Quisbert Alejandro Ruben" data-color="#00772D"><span class="subj" style="color:#FFFFFF">Harware de Computadoras</span><div class="prof" style="color:#FFFFFF">Licon</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Inglés Técnico" data-codigo="INT-103" data-carga="2" data-nivel="Primer Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Inglés Técnico</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles I" data-codigo="PDM-205" data-carga="4" data-nivel="Segundo Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles I</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web III" data-codigo="DPW-302" data-carga="4" data-nivel="Tercer Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web III</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">MARTES</td>
+  <td class="time">08:00–09:30</td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web 1</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Programación II" data-codigo="PRG-202" data-carga="6" data-nivel="Segundo Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Programación II</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Redes de Computadoras II" data-codigo="RDC-304" data-carga="4" data-nivel="Tercer Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Redes de Computadoras II</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">09:30–11:00</td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Matemática p/ Informática</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web 1</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Programación II" data-codigo="PRG-202" data-carga="6" data-nivel="Segundo Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Programación II</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles II" data-codigo="PDM-307" data-carga="4" data-nivel="Tercer Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles II</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">11:15–12:45</td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Inglés Técnico" data-codigo="INT-103" data-carga="2" data-nivel="Primer Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Inglés Técnico</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Matemática p/ Informática</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles I" data-codigo="PDM-205" data-carga="4" data-nivel="Segundo Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles I</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas II" data-codigo="ADS-306" data-carga="4" data-nivel="Tercer Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Análisis y Diseño Sist. II</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">MIÉRCOLES</td>
+  <td class="time">08:00–09:30</td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web II" data-codigo="DPW-207" data-carga="4" data-nivel="Segundo Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web II</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Base de Datos II" data-codigo="BDD-308" data-carga="4" data-nivel="Tercer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Base de Datos II</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">09:30–11:00</td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Programación 1</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web II" data-codigo="DPW-207" data-carga="4" data-nivel="Segundo Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web II</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Base de Datos II" data-codigo="BDD-308" data-carga="4" data-nivel="Tercer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Base de Datos II</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">11:15–12:45</td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Programación 1</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Estadística" data-codigo="EST-201" data-carga="2" data-nivel="Segundo Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Estadística</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#88DAEA" onclick="showM(this)" data-materia="Diseño y Programación Web III" data-codigo="DPW-302" data-carga="4" data-nivel="Tercer Año" data-docente="Cuarite Alanoca Ruben" data-color="#88DAEA"><span class="subj" style="color:#003D5C">Diseño y Prog. Web III</span><div class="prof" style="color:#003D5C">Cuarite</div><span class="hint" style="color:#003D5C">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">JUEVES</td>
+  <td class="time">08:00–09:30</td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Programación 1</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas I" data-codigo="ADS-206" data-carga="4" data-nivel="Segundo Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Análisis y Diseño Sist. I</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Taller de Modalidad de Graduación" data-codigo="TMG-305" data-carga="4" data-nivel="Tercer Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Taller Modalidad Graduación</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">09:30–11:00</td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Programación 1</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Matemática p/ Informática</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas I" data-codigo="ADS-206" data-carga="4" data-nivel="Segundo Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Análisis y Diseño Sist. I</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Taller de Modalidad de Graduación" data-codigo="TMG-305" data-carga="4" data-nivel="Tercer Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Taller Modalidad Graduación</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">11:15–12:45</td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Matemática p/ Informática</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Base de Datos I" data-codigo="BDD-208" data-carga="4" data-nivel="Segundo Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Base de Datos I</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Gestión Mejoramiento de la Calidad de Software" data-codigo="GMC-303" data-carga="2" data-nivel="Tercer Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Gestión Mejoramiento Software</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">VIERNES</td>
+  <td class="time">08:00–09:30</td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#00772D" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Licon Quisbert Alejandro Ruben" data-color="#00772D"><span class="subj" style="color:#FFFFFF">Harware de Computadoras</span><div class="prof" style="color:#FFFFFF">Licon</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Redes de Computadoras I" data-codigo="RDC-204" data-carga="4" data-nivel="Segundo Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Redes de Computadoras I</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Emprendimiento Productivo" data-codigo="EMP-301" data-carga="4" data-nivel="Tercer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Emprendimiento Productivo</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">09:30–11:00</td>
+  <td class="cell" style="background:#00772D" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Licon Quisbert Alejandro Ruben" data-color="#00772D"><span class="subj" style="color:#FFFFFF">Harware de Computadoras</span><div class="prof" style="color:#FFFFFF">Licon</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Redes de Computadoras I" data-codigo="RDC-204" data-carga="4" data-nivel="Segundo Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Redes de Computadoras I</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Emprendimiento Productivo" data-codigo="EMP-301" data-carga="4" data-nivel="Tercer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Emprendimiento Productivo</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">11:15–12:45</td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#660032" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Galindo Andulce Rosmery" data-color="#660032"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Galindo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#00772D" onclick="showM(this)" data-materia="Estructura de Datos" data-codigo="EDD-203" data-carga="2" data-nivel="Segundo Año" data-docente="Licon Quisbert Alejandro Ruben" data-color="#00772D"><span class="subj" style="color:#FFFFFF">Estructura de Datos</span><div class="prof" style="color:#FFFFFF">Licon</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Redes de Computadoras II" data-codigo="RDC-304" data-carga="4" data-nivel="Tercer Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Redes de Computadoras II</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<!-- ══════════ TURNO NOCHE ══════════ -->
+<div class="shift-header"><h3>🌙 Turno Noche</h3></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th colspan="2"></th><th>1C</th><th>1D</th><th>2B</th><th>3B</th></tr></thead>
+<tbody>
+
+<tr>
+  <td class="day" rowspan="3">LUNES</td>
+  <td class="time">18:45–19:50</td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Diseño y Prog. Web 1</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Diseño y Prog. Web 1</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Programación II" data-codigo="PRG-202" data-carga="6" data-nivel="Segundo Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Programación II</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles II" data-codigo="PDM-307" data-carga="4" data-nivel="Tercer Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles II</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">20:00–21:00</td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Matemática p/ Informática</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Programación II" data-codigo="PRG-202" data-carga="6" data-nivel="Segundo Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Programación II</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas II" data-codigo="ADS-306" data-carga="4" data-nivel="Tercer Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Análisis y Diseño Sist. II</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">21:00–22:00</td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#00772D" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Licon Quisbert Alejandro Ruben" data-color="#00772D"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Licon</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas I" data-codigo="ADS-206" data-carga="4" data-nivel="Segundo Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Análisis y Diseño Sist. I</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Gestión Mejoramiento de la Calidad de Software" data-codigo="GMC-303" data-carga="2" data-nivel="Tercer Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Gestión Mejoramiento Software</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">MARTES</td>
+  <td class="time">18:45–19:50</td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Harware de Computadoras</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Diseño y Prog. Web 1</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Base de Datos I" data-codigo="BDD-208" data-carga="4" data-nivel="Segundo Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Base de Datos I</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Redes de Computadoras II" data-codigo="RDC-304" data-carga="4" data-nivel="Tercer Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Redes de Computadoras II</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">20:00–21:00</td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Harware de Computadoras</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Redes de Computadoras I" data-codigo="RDC-204" data-carga="4" data-nivel="Segundo Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Redes de Computadoras I</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Diseño y Programación Web III" data-codigo="DPW-302" data-carga="4" data-nivel="Tercer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Diseño y Prog. Web III</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">21:00–22:00</td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Inglés Técnico" data-codigo="INT-103" data-carga="2" data-nivel="Primer Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Inglés Técnico</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Redes de Computadoras I" data-codigo="RDC-204" data-carga="4" data-nivel="Segundo Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Redes de Computadoras I</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Diseño y Programación Web III" data-codigo="DPW-302" data-carga="4" data-nivel="Tercer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Diseño y Prog. Web III</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">MIÉRCOLES</td>
+  <td class="time">18:45–19:50</td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Diseño y Programación Web 1" data-codigo="DPW-107" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Diseño y Prog. Web 1</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#00772D" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Licon Quisbert Alejandro Ruben" data-color="#00772D"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Licon</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Diseño y Programación Web II" data-codigo="DPW-207" data-carga="4" data-nivel="Segundo Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Diseño y Prog. Web II</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Emprendimiento Productivo" data-codigo="EMP-301" data-carga="4" data-nivel="Tercer Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Emprendimiento Productivo</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">20:00–21:00</td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Matemática p/ Informática</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Diseño y Programación Web II" data-codigo="DPW-207" data-carga="4" data-nivel="Segundo Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Diseño y Prog. Web II</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Emprendimiento Productivo" data-codigo="EMP-301" data-carga="4" data-nivel="Tercer Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Emprendimiento Productivo</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">21:00–22:00</td>
+  <td class="cell" style="background:#3399FE" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Centellas Tarquino Jhonny" data-color="#3399FE"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Centellas</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFFF00" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas I" data-codigo="ADS-206" data-carga="4" data-nivel="Segundo Año" data-docente="Callisaya Loza Clemente Gonzalo" data-color="#FFFF00"><span class="subj" style="color:#000000">Análisis y Diseño Sist. I</span><div class="prof" style="color:#000000">Callisaya</div><span class="hint" style="color:#000000">ℹ</span></td>
+  <td class="cell" style="background:#FF0066" onclick="showM(this)" data-materia="Análisis y Diseño de Sistemas II" data-codigo="ADS-306" data-carga="4" data-nivel="Tercer Año" data-docente="Aguilar Gemio Oscar" data-color="#FF0066"><span class="subj" style="color:#FFFFFF">Análisis y Diseño Sist. II</span><div class="prof" style="color:#FFFFFF">Aguilar</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">JUEVES</td>
+  <td class="time">18:45–19:50</td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Harware de Computadoras</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles I" data-codigo="PDM-205" data-carga="4" data-nivel="Segundo Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles I</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Taller de Modalidad de Graduación" data-codigo="TMG-305" data-carga="4" data-nivel="Tercer Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Taller Modalidad Graduación</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">20:00–21:00</td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Harware de Computadoras" data-codigo="HDC-104" data-carga="4" data-nivel="Primer Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Harware de Computadoras</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles I" data-codigo="PDM-205" data-carga="4" data-nivel="Segundo Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles I</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+  <td class="cell" style="background:#FF66FF" onclick="showM(this)" data-materia="Taller de Modalidad de Graduación" data-codigo="TMG-305" data-carga="4" data-nivel="Tercer Año" data-docente="Cenzano Mendez Antonia Yannet" data-color="#FF66FF"><span class="subj" style="color:#4D004D">Taller Modalidad Graduación</span><div class="prof" style="color:#4D004D">Cenzano</div><span class="hint" style="color:#4D004D">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">21:00–22:00</td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Taller Sistemas Operativos" data-codigo="TSO-105" data-carga="4" data-nivel="Primer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Taller Sist. Operativos</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#99FF32" onclick="showM(this)" data-materia="Programación II" data-codigo="PRG-202" data-carga="6" data-nivel="Segundo Año" data-docente="Torrez Chavez Herbert Jose" data-color="#99FF32"><span class="subj" style="color:#0D4D0D">Programación II</span><div class="prof" style="color:#0D4D0D">Torrez</div><span class="hint" style="color:#0D4D0D">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Programación para Dispositivos Móviles II" data-codigo="PDM-307" data-carga="4" data-nivel="Tercer Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Prog. Disp. Móviles II</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+</tr>
+
+<tr>
+  <td class="day" rowspan="3">VIERNES</td>
+  <td class="time">18:45–19:50</td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Matemática p/ Informática</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FFD700" onclick="showM(this)" data-materia="Estadística" data-codigo="EST-201" data-carga="2" data-nivel="Segundo Año" data-docente="Condori Canaviri Juan Vito" data-color="#FFD700"><span class="subj" style="color:#6B4500">Estadística</span><div class="prof" style="color:#6B4500">Condori</div><span class="hint" style="color:#6B4500">ℹ</span></td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Redes de Computadoras II" data-codigo="RDC-304" data-carga="4" data-nivel="Tercer Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Redes de Computadoras II</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">20:00–21:00</td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Matemática para la Informática" data-codigo="MPI-101" data-carga="4" data-nivel="Primer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Matemática p/ Informática</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Programación 1" data-codigo="PRG-102" data-carga="8" data-nivel="Primer Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Programación 1</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Estructura de Datos" data-codigo="EDD-203" data-carga="2" data-nivel="Segundo Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Estructura de Datos</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Base de Datos II" data-codigo="BDD-308" data-carga="4" data-nivel="Tercer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Base de Datos II</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+<tr>
+  <td class="time">21:00–22:00</td>
+  <td class="cell" style="background:#3A3839" onclick="showM(this)" data-materia="Ofimática y Tecnología Multimedia" data-codigo="OTM-106" data-carga="4" data-nivel="Primer Año" data-docente="Tintaya Segales Humerto Mario" data-color="#3A3839"><span class="subj" style="color:#FFFFFF">Ofimática y Tec. Multimedia</span><div class="prof" style="color:#FFFFFF">Tintaya</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#7030A0" onclick="showM(this)" data-materia="Inglés Técnico" data-codigo="INT-103" data-carga="2" data-nivel="Primer Año" data-docente="Sanchez Apaza Raul" data-color="#7030A0"><span class="subj" style="color:#FFFFFF">Inglés Técnico</span><div class="prof" style="color:#FFFFFF">Sanchez</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#A5A5A5" onclick="showM(this)" data-materia="Base de Datos I" data-codigo="BDD-208" data-carga="4" data-nivel="Segundo Año" data-docente="Jemio Salinas Luis" data-color="#A5A5A5"><span class="subj" style="color:#FFFFFF">Base de Datos I</span><div class="prof" style="color:#FFFFFF">Jemio</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+  <td class="cell" style="background:#FF0000" onclick="showM(this)" data-materia="Base de Datos II" data-codigo="BDD-308" data-carga="4" data-nivel="Tercer Año" data-docente="Pozo Diaz Victor Pablo" data-color="#FF0000"><span class="subj" style="color:#FFFFFF">Base de Datos II</span><div class="prof" style="color:#FFFFFF">Pozo</div><span class="hint" style="color:#FFFFFF">ℹ</span></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-title">Docentes</div>
+  <div class="legend-item"><div class="ldot" style="background:#64B5F6;border:1px solid rgba(0,0,0,.12)"></div><span>Cuarite Alanoca Ruben</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#BA68C8;border:1px solid rgba(0,0,0,.12)"></div><span>Sanchez Apaza Raul</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#90A4AE;border:1px solid rgba(0,0,0,.12)"></div><span>Jemio Salinas Luis</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#F06292;border:1px solid rgba(0,0,0,.12)"></div><span>Aguilar Gemio Oscar</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#66BB6A;border:1px solid rgba(0,0,0,.12)"></div><span>Licon Quisbert Alejandro R.</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FFD54F;border:1px solid rgba(0,0,0,.12)"></div><span>Condori Canaviri Juan Vito</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#C6FF00;border:1px solid rgba(0,0,0,.12)"></div><span>Callisaya Loza C. Gonzalo</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#EF5350;border:1px solid rgba(0,0,0,.12)"></div><span>Centellas Tarquino Jhonny</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FF6F00;border:1px solid rgba(0,0,0,.12)"></div><span>Torrez Chavez Herbert Jose</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#3F51B5;border:1px solid rgba(0,0,0,.12)"></div><span>Galindo Andulce Rosmery</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#37474F;border:1px solid rgba(0,0,0,.12)"></div><span>Pozo Diaz Victor Pablo</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#E040FB;border:1px solid rgba(0,0,0,.12)"></div><span>Cenzano Mendez Antonia Y.</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#00838F;border:1px solid rgba(0,0,0,.12)"></div><span>Tintaya Segales Humerto M.</span></div>
+</div>
+  <div class="legend-item"><div class="ldot" style="background:#64B5F6;border:1px solid rgba(0,0,0,.12)"></div><span>Cuarite Alanoca Ruben</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#BA68C8;border:1px solid rgba(0,0,0,.12)"></div><span>Sanchez Apaza Raul</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#90A4AE;border:1px solid rgba(0,0,0,.12)"></div><span>Jemio Salinas Luis</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#F06292;border:1px solid rgba(0,0,0,.12)"></div><span>Aguilar Gemio Oscar</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#66BB6A;border:1px solid rgba(0,0,0,.12)"></div><span>Licon Quisbert Alejandro R.</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FFD54F;border:1px solid rgba(0,0,0,.12)"></div><span>Condori Canaviri Juan Vito</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#C6FF00;border:1px solid rgba(0,0,0,.12)"></div><span>Callisaya Loza C. Gonzalo</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#EF5350;border:1px solid rgba(0,0,0,.12)"></div><span>Centellas Tarquino Jhonny</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FF6F00;border:1px solid rgba(0,0,0,.12)"></div><span>Torrez Chavez Herbert Jose</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#3F51B5;border:1px solid rgba(0,0,0,.12)"></div><span>Galindo Andulce Rosmery</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#37474F;border:1px solid rgba(0,0,0,.12)"></div><span>Pozo Diaz Victor Pablo</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#E040FB;border:1px solid rgba(0,0,0,.12)"></div><span>Cenzano Mendez Antonia Y.</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#00838F;border:1px solid rgba(0,0,0,.12)"></div><span>Tintaya Segales Humerto M.</span></div>
+</div>
+  <div class="legend-item"><div class="ldot" style="background:#87CEEB;border:1px solid rgba(0,0,0,.15)"></div><span>Cuarite Alanoca Ruben</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#9370DB;border:1px solid rgba(0,0,0,.15)"></div><span>Sanchez Apaza Raul</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#808080;border:1px solid rgba(0,0,0,.15)"></div><span>Jemio Salinas Luis</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FF1493;border:1px solid rgba(0,0,0,.15)"></div><span>Aguilar Gemio Oscar</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#32CD32;border:1px solid rgba(0,0,0,.15)"></div><span>Licon Quisbert Alejandro R.</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FFD700;border:1px solid rgba(0,0,0,.15)"></div><span>Condori Canaviri Juan Vito</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FFFF00;border:1px solid rgba(0,0,0,.15)"></div><span>Callisaya Loza C. Gonzalo</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#00BFFF;border:1px solid rgba(0,0,0,.15)"></div><span>Centellas Tarquino Jhonny</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#90EE90;border:1px solid rgba(0,0,0,.15)"></div><span>Torrez Chavez Herbert Jose</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#8B008B;border:1px solid rgba(0,0,0,.15)"></div><span>Galindo Andulce Rosmery</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FF0000;border:1px solid rgba(0,0,0,.15)"></div><span>Pozo Diaz Victor Pablo</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#FF00FF;border:1px solid rgba(0,0,0,.15)"></div><span>Cenzano Mendez Antonia Y.</span></div>
+  <div class="legend-item"><div class="ldot" style="background:#00CED1;border:1px solid rgba(0,0,0,.15)"></div><span>Tintaya Segales Humerto M.</span></div>
+</div>
+
+<footer>ISEC La Paz &nbsp;·&nbsp; Sistemas Informáticos &nbsp;·&nbsp; Horario 2026</footer>
+
+<!-- ══ MODAL ══ -->
+<div class="overlay" id="ov" onclick="if(event.target===this)closeM()">
+  <div class="modal">
+    <div class="modal-head" id="mhead">
+      <div class="modal-badge" id="mcod"></div>
+      <div class="modal-title" id="mmat"></div>
+      <button class="modal-x" onclick="closeM()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="mrow">
+        <div class="micon" style="background:#e8f5e9">📚</div>
+        <div>
+          <div class="mlabel">Carga Horaria</div>
+          <div class="mvalue" id="mcar"></div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="micon" style="background:#e3f2fd">🎓</div>
+        <div>
+          <div class="mlabel">Nivel</div>
+          <div class="mvalue" id="mniv"></div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="micon" style="background:#fce4ec">👨‍🏫</div>
+        <div>
+          <div class="mlabel">Docente</div>
+          <div class="mvalue" id="mdoc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showM(el){
+  document.getElementById('mmat').textContent = el.dataset.materia;
+  document.getElementById('mcod').textContent = el.dataset.codigo;
+  document.getElementById('mcar').textContent = el.dataset.carga + ' horas semanales';
+  document.getElementById('mniv').textContent = el.dataset.nivel;
+  document.getElementById('mdoc').textContent = el.dataset.docente;
+  var c = el.dataset.color;
+  document.getElementById('mhead').style.background = 'linear-gradient(135deg,'+c+'ee,'+c+'99)';
+  document.getElementById('ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeM(){
+  document.getElementById('ov').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+</script>
+</body>
+</html>
